@@ -3,45 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinician Shift Widget</title>
+    <title>Clinician Shift Widget - Mayo Style</title>
     <style>
-        /* --- CSS STYLES --- */
+        /* --- UPDATED CSS STYLES (Mayo Clinic Branding) --- */
         :root {
-            --primary-color: #0056b3;
-            --accent-color: #e3f2fd;
-            --text-color: #333;
-            --border-color: #ddd;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --bg-color: #f9f9f9;
+            /* Core Brand Colors */
+            --mayo-blue: #005eb8;
+            --mayo-blue-dark: #004a99; /* For hovers */
+            --mayo-green: #00853e;
+            --mayo-orange: #ff9800;
+            
+            /* Neutrals */
+            --text-dark: #333333;
+            --text-medium: #666666;
+            --border-light: #dce0e5;
+            --bg-light: #f7f7f7;
+            --white: #ffffff;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            /* Prioritize Helvetica Neue for that clean, clinical look */
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #e9ecef; /* Slightly darker background for contrast with widget */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            color: var(--text-dark);
         }
 
         /* Widget Container */
         .widget-container {
             width: 380px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background: var(--white);
+            border-radius: 8px; /* Slightly tighter radius */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); /* softer shadow */
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            border: 1px solid var(--border-light);
         }
 
         /* Header */
         .widget-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
+            background-color: var(--mayo-blue);
+            color: var(--white);
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -49,319 +57,19 @@
 
         .widget-header h2 {
             margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 500; /* Less bold headers */
+            letter-spacing: 0.5px;
         }
 
         .clinician-avatar {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             background-color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-        }
-
-        /* Shift List */
-        .shift-list {
-            padding: 15px;
-            background-color: var(--bg-color);
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .shift-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            transition: transform 0.2s;
-            position: relative;
-        }
-
-        .shift-card:hover {
-            border-color: var(--primary-color);
-        }
-
-        .shift-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .shift-date {
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        .shift-details {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 12px;
-        }
-
-        .shift-time, .shift-dept {
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-confirmed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        /* Buttons */
-        .btn-switch {
-            width: 100%;
-            padding: 8px;
-            background-color: white;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .btn-switch:hover {
-            background-color: var(--accent-color);
-        }
-
-        .btn-switch:disabled {
-            border-color: #ccc;
-            color: #ccc;
-            cursor: not-allowed;
-            background-color: #f9f9f9;
-        }
-
-        /* Modal / Overlay */
-        .modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none; /* Hidden by default */
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .modal {
-            background: white;
-            width: 85%;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal h3 {
-            margin-top: 0;
-            color: var(--text-color);
-        }
-
-        .modal p {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .btn-confirm {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background-color: #eee;
-            color: #333;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-    </style>
-</head>
-<body>
-
-    <div class="widget-container" id="widget">
-        
-        <div class="widget-header">
-            <h2>My Shifts</h2>
-            <div class="clinician-avatar">JD</div>
-        </div>
-
-        <div class="shift-list" id="shiftList">
-            </div>
-
-        <div class="modal-overlay" id="switchModal">
-            <div class="modal">
-                <h3>Request Switch</h3>
-                <p>Are you sure you want to post this shift to the exchange board?</p>
-                <div id="modalContent">
-                    <p id="selectedShiftInfo" style="font-weight:bold; color: #333;"></p>
-                    <div class="spinner" id="loadingSpinner"></div>
-                    <div class="modal-actions" id="modalActions">
-                        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                        <button class="btn-confirm" onclick="confirmSwitch()">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        /* --- JAVASCRIPT LOGIC --- */
-
-        // 1. Mock Data State
-        const state = {
-            shifts: [
-                { id: 101, date: 'Oct 24, 2023', time: '08:00 - 20:00', dept: 'Emergency', status: 'confirmed' },
-                { id: 102, date: 'Oct 26, 2023', time: '14:00 - 22:00', dept: 'Pediatrics', status: 'confirmed' },
-                { id: 103, date: 'Oct 28, 2023', time: '08:00 - 16:00', dept: 'ICU', status: 'confirmed' },
-                { id: 104, date: 'Oct 30, 2023', time: '20:00 - 08:00', dept: 'Emergency', status: 'switch_pending' }
-            ],
-            selectedShiftId: null
-        };
-
-        // 2. Render Function
-        function renderShifts() {
-            const listContainer = document.getElementById('shiftList');
-            listContainer.innerHTML = ''; // Clear current list
-
-            if (state.shifts.length === 0) {
-                listContainer.innerHTML = '<p style="text-align:center; color:#999;">No upcoming shifts.</p>';
-                return;
-            }
-
-            state.shifts.forEach(shift => {
-                const isPending = shift.status === 'switch_pending';
-                
-                // Create Card Element
-                const card = document.createElement('div');
-                card.className = 'shift-card';
-                
-                card.innerHTML = `
-                    <div class="shift-header">
-                        <span class="shift-date">${shift.date}</span>
-                        <span class="status-badge ${isPending ? 'status-pending' : 'status-confirmed'}">
-                            ${isPending ? 'Pending Swap' : 'Confirmed'}
-                        </span>
-                    </div>
-                    <div class="shift-details">
-                        <div class="shift-time">⏰ ${shift.time}</div>
-                        <div class="shift-dept">🏥 ${shift.dept}</div>
-                    </div>
-                    <button 
-                        class="btn-switch" 
-                        onclick="initiateSwitch(${shift.id})" 
-                        ${isPending ? 'disabled' : ''}>
-                        ${isPending ? 'Request Sent' : 'Switch / Trade'}
-                    </button>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
-
-        // 3. Interaction Functions
-
-        // Open Modal
-        function initiateSwitch(shiftId) {
-            state.selectedShiftId = shiftId;
-            const shift = state.shifts.find(s => s.id === shiftId);
-            
-            document.getElementById('selectedShiftInfo').innerText = `${shift.date} | ${shift.dept}`;
-            document.getElementById('switchModal').style.display = 'flex';
-            
-            // Reset modal state (in case it was loading previously)
-            document.getElementById('modalActions').style.display = 'flex';
-            document.getElementById('loadingSpinner').style.display = 'none';
-        }
-
-        // Close Modal
-        function closeModal() {
-            document.getElementById('switchModal').style.display = 'none';
-            state.selectedShiftId = null;
-        }
-
-        // Confirm Switch (Mock API Call)
-        function confirmSwitch() {
-            // UI Feedback: Show Loading
-            document.getElementById('modalActions').style.display = 'none';
-            document.getElementById('loadingSpinner').style.display = 'block';
-
-            // Simulate Network Delay (1.5 seconds)
-            setTimeout(() => {
-                // Update State
-                const shiftIndex = state.shifts.findIndex(s => s.id === state.selectedShiftId);
-                if (shiftIndex !== -1) {
-                    state.shifts[shiftIndex].status = 'switch_pending';
-                }
-
-                // Close Modal & Re-render
-                closeModal();
-                renderShifts();
-
-                // Optional: Alert or Toast could go here
-                console.log(`Shift ${state.selectedShiftId} set to pending.`);
-            }, 1000);
-        }
-
-        // 4. Initialize
-        renderShifts();
-
-    </script>
-</body>
-</html>
+            font-size: 0.85rem;
+            font-weight
